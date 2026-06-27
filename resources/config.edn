@@ -1,0 +1,5 @@
+{:mqtt-config {:uri #profile {:default "tcp://:1883"
+                              :test "tcp://127.0.0.1:1883"}
+               :username #profile {:default "sage"}
+               :password #profile {:default #env MQTT_PASSWORD}
+               :auto-reconnect true}}
