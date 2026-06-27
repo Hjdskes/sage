@@ -47,8 +47,8 @@
   "Applies the given handler-fn to each message received over MQTT.
 
    Returns a closeable that contains the connection to MQTT and disconnects on close."
-  [profile handler-fn]
-  (let [{:keys [uri username] :as mqtt-config} (config/get-config-key :mqtt-config profile)
+  [handler-fn]
+  (let [{:keys [uri username] :as mqtt-config} (config/get :mqtt-config)
         _ (t/log! {:data (assoc-some {:mqtt/broker uri} :mqtt/username username)} "Connecting to MQTT")
         conn (mqtt.client/connect! uri {:client-id "sage"
                                         :on-connect-complete-fn connect-complete-handler
