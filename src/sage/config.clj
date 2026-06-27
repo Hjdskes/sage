@@ -6,15 +6,20 @@
 
 ;; TODO: some kind of spec validation on config?
 
-(def ^:private load-config
-  (memoize
-    (fn [profile]
-      (aero/read-config (io/resource "config.edn") {:profile profile}))))
+(def ^:private *config
+  (atom nil))
 
-;; TODO: get rid of having to pass `profile`.
-(defn get-config-key
-  "Read the key from the config, which is memoized and lazily loaded."
-  ([key]
-   (get-config-key key :default))
-  ([key profile]
-   (get (load-config profile) key)))
+(defn init!
+  "Load and store the config for the given profile.
+
+   Must be called once at startup before calling any other function that works
+   on the config, such as get-key.
+
+   Calling this function again replaces the config (useful in tests to switch profiles)."
+  [profile]
+  (reset! *config (aero/read-config (io/resource "config.edn") {:profile profile})))
+
+(defn get-key
+  "Returns the value for the given key from the initialised config."
+  [key]
+  (clojure.core/get @*config key))

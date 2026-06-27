@@ -1,5 +1,6 @@
 (ns sage.main
   (:require
+    [sage.config :as config]
     [sage.mqtt :as mqtt]
     [sage.odoyle.session :as odoyle.session]
     [taoensso.telemere :as t])
@@ -25,11 +26,10 @@
 
 (defn start!
   "Starts Sage, returning a closeable that closes all connections and frees all resources."
-  ([]
-   (start! {}))
-  ([profile]
-   (t/log! "Starting Sage")
-   (mqtt/start-system! profile odoyle.session/mqtt-handler)))
+  [profile]
+  (t/log! "Starting Sage")
+  (config/init! profile)
+  (mqtt/start-system! odoyle.session/mqtt-handler))
 
 (defn -main
   "Main entrypoint into Sage."
