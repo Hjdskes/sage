@@ -1,0 +1,6 @@
+{:extra-indents {and [[:block 0]]
+                 for-all [[:block 1]]
+                 or [[:block 0]]}
+ :function-arguments-indentation :cursive
+ :remove-multiple-non-indenting-spaces? true
+ :sort-ns-references? true}
