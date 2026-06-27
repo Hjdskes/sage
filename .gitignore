@@ -1,0 +1,13 @@
+# Nix
+result
+result-*
+
+# Direnv
+.direnv
+
+# Clojure
+.calva
+.clj-kondo/.cache
+.cpcache
+.lsp/.cache
+.nrepl-port
