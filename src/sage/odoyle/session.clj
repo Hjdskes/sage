@@ -1,9 +1,7 @@
 (ns sage.odoyle.session
   (:require
-    [clojure.data.json :as json]
     [clojure.set :as set]
     [odoyle.rules :as o]
-    [sage.mqtt.client :as mqtt.client]
     [sage.odoyle.facts :as facts]
     [sage.odoyle.rules :as rules]
     [taoensso.telemere :as t]))
@@ -49,23 +47,17 @@
                         (retract-commands session command-facts))))
     (map #(set/rename-keys % {:device-id ::facts/device-id :command ::facts/command}) @*command-facts)))
 
-;; TODO: should publishing happen here, or inside start-system!?
-;; TODO: when publishing, should we block or just scream into the void?
-;;       can we register a callback and alert on an error?
 (defn mqtt-handler
   "Bridges MQTT and O'Doyle.
 
    For each MQTT message, derive a sequence of facts, insert those into the O'Doyle session, fire
-   the rules, extract and retract the commands that are output by the rules, and emit those commands over
-   MQTT."
-  [conn topic data]
-  (let [facts (facts/->facts topic data)]
-    (if (seq facts)
-      (do
-        (t/log! {:data {:facts facts}} "Received new facts over MQTT")
-        (let [command-facts (process-facts! facts)]
-          (doseq [fact command-facts
-                  :let [[topic mqtt-message] (facts/<-fact fact)]]
-            (t/trace! {:id :mqtt/publish :data {:mqtt/topic topic :mqtt/message mqtt-message}})
-            (mqtt.client/publish! conn topic (json/write-str mqtt-message)))))
-      (t/log! {:data {:mqtt/message data}} "Received no new facts over MQTT"))))
+   the rules, extract and retract the commands that are output by the rules, and return those commands
+   in a sequence of zero or more [topic message] tuples."
+  [topic data]
+  (if-let [facts (seq (facts/->facts topic data))]
+    (do
+      (t/log! {:data {:facts facts}} "Received new facts over MQTT")
+      (map facts/<-fact (process-facts! facts)))
+    (do
+      (t/log! "Received no new facts over MQTT")
+      [])))
