@@ -23,7 +23,7 @@
   (t/log! {:level :warn :data {:mqtt/topic topic}} "Received unhandled MQTT message"))
 
 (defn- message-handler
-  [handler-fn]
+  [conn handler-fn]
   (fn sage-mqtt-consumer [topic metadata payload]
     (when-let [payload (try (-> payload
                                 (io/reader :encoding "UTF-8")
@@ -37,7 +37,12 @@
                               nil))]
       (t/trace! {:id :mqtt/handler :data {:mqtt/topic topic :mqtt/metadata metadata :mqtt/payload payload}}
                 (try
-                  (handler-fn topic payload)
+                  (let [outputs (handler-fn topic payload)]
+                    (doseq [[topic message] outputs]
+                      (t/trace! {:id :mqtt/publish :data {:mqtt/topic topic :mqtt/message message}})
+                      ;; TODO: when publishing, should we block or just scream into the void?
+                      ;;       can we register a callback and alert on an error?
+                      (mqtt.client/publish! conn topic (json/write-str message))))
                   (catch Exception ex
                     ; Don't rethrow so as to not blow up the thread/subscription.
                     (t/log! {:level :error :data (assoc (Throwable->map ex) :mqtt/payload payload)}
@@ -67,7 +72,7 @@
       ;; or messages that aren't meant for us, such as /set or /get.
       ;; TODO: subscribing to # means any retained messages on the broker are delivered immediately at
       ;; startup.
-      (mqtt.client/subscribe! conn "#" :at-most-once (message-handler (partial handler-fn conn)))
+      (mqtt.client/subscribe! conn "#" :at-most-once (message-handler conn handler-fn))
       5000)
     (closeable conn (fn [conn]
                       (t/log! {:data {:mqtt/broker uri}} "Disconnecting from MQTT")
