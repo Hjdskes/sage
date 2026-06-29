@@ -34,7 +34,7 @@
   (t/log! {:data {:config/profile profile}} "Starting Sage")
   (try
     (config/init! profile)
-    (mqtt/start-system! odoyle.session/mqtt-handler)
+    (mqtt/start-system! (odoyle.session/->mqtt-handler))
     (catch Exception e
       (t/log! {:level :error :data (Throwable->map e)} "Exception during startup")
       nil)))
