@@ -31,7 +31,7 @@
   [profile]
   (t/log! {:data {:config/profile profile}} "Starting Sage")
   (config/init! profile)
-  (mqtt/start-system! odoyle.session/mqtt-handler))
+  (mqtt/start-system! (odoyle.session/->mqtt-handler)))
 
 (defn -main
   "Main entrypoint into Sage."
