@@ -50,7 +50,7 @@
 
   (defn stop
     []
-    (when (bound? #'sage) (.close ^java.lang.AutoCloseable sage)))
+    (when (bound? #'sage) (try (.close ^java.lang.AutoCloseable sage) (catch Exception _e nil))))
 
   (defn start
     []
