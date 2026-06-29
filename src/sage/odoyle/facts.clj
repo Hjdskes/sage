@@ -50,7 +50,7 @@
 
    For example, the fact
 
-   {:sage.odoyle.facts/device-id \"zigbee2mqtt/friendly_name\" :command {:state \"ON\"}}
+   {:sage.odoyle.facts/device-id \"zigbee2mqtt/friendly_name\" :sage.odoyle.facts/command {:state \"ON\"}}
 
    turns into an MQTT message to topic \"zigbee2mqtt/friendly_name\" with JSON payload {\"state\": \"ON\"}."
   [{::keys [device-id command] :as _command-fact}]
