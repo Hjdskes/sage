@@ -1,5 +1,6 @@
 (ns sage.main
   (:require
+    [sage.config :as config]
     [sage.mqtt :as mqtt]
     [sage.odoyle.session :as odoyle.session]
     [taoensso.telemere :as t])
@@ -27,18 +28,17 @@
 
 (defn start!
   "Starts Sage, returning a closeable that closes all connections and frees all resources."
-  ([]
-   (start! :default))
-  ([profile]
-   (t/log! "Starting Sage")
-   (mqtt/start-system! profile odoyle.session/mqtt-handler)))
+  [profile]
+  (t/log! {:data {:config/profile profile}} "Starting Sage")
+  (config/init! profile)
+  (mqtt/start-system! odoyle.session/mqtt-handler))
 
 (defn -main
   "Main entrypoint into Sage."
   [& _args]
   (set-uncaught-exception-handler!)
   (let [latch (java.util.concurrent.CountDownLatch. 1)
-        sage (start!)]
+        sage (start! :default)]
     (.addShutdownHook (Runtime/getRuntime)
                       (Thread. ^Runnable (fn []
                                            (shutdown! sage)
