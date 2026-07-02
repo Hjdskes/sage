@@ -1,0 +1,21 @@
+name: Setup Nix & Clojure environment
+description: Installs Nix, caches the Nix store, and caches Clojure deps
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@v22
+    - name: Cache the Nix store
+      uses: DeterminateSystems/magic-nix-cache-action@v14
+      with:
+        use-flakehub: false
+    - name: Cache Clojure dependencies
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.m2/repository
+          ~/.gitlibs
+          .cpcache
+        key: ${{ runner.os }}-clj-${{ hashFiles('deps.edn') }}
+        restore-keys: |
+          ${{ runner.os }}-clj-
