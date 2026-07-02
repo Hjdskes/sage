@@ -33,9 +33,9 @@ jobs:
           key: ${{ runner.os }}-clj-${{ hashFiles('deps.edn') }}
           restore-keys: |
             ${{ runner.os }}-clj-
+      - name: Format the entire source tree
+        run: nix fmt
       - name: Lint with clj-kondo
         run: nix develop --command clj -M:clj-kondo --lint src test
-      - name: Format with cljfmt
-        run: nix develop --command clj -T:cljfmt check
       - name: Run tests
         run: nix develop --command clj -X:dev:test
