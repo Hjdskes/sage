@@ -21,7 +21,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Cache the Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v14
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v7
       - name: Check that Dependabot is in sync with deps.edn
         run: nix develop --command  .github/dependabot/clojure2dependabot.sh update+check
