@@ -1,0 +1,29 @@
+name: Dependabot Clojure bridge
+
+# Trigger only when pom.xml changes (presumably because Dependabot ran) or
+# when deps.edn changes (because we've added a new dependency).
+on:
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'deps.edn'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+      - name: Cache the Nix store
+        uses: DeterminateSystems/magic-nix-cache-action@v14
+        with:
+          use-flakehub: false
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Check that Dependabot is in sync with deps.edn
+        run: nix develop --command  .github/dependabot/clojure2dependabot.sh update+check

@@ -4,12 +4,12 @@ My home automation system
 
 ## Bugs
 
-For any bug or request, please [create an issue](https://github.com/Hjdskes/sage/issues/new) on [GitHub][github].
+For any bug or request, please [create an issue](https://github.com/Hjdskes/sage/issues/new) on [GitHub].
 
 ## License
 
-Please see [LICENSE](https://github.com/Hjdskes/sage/blob/main/LICENSE) on [GitHub][github].
+Please see [LICENSE](https://github.com/Hjdskes/sage/blob/main/LICENSE) on [GitHub].
 
-**Copyright © 2026** Jente Hidskes Ankarberg &lt;dev@hjdskes.nl&gt;
+**Copyright © 2026** Jente Hidskes Ankarberg \<dev@hjdskes.nl>
 
 [github]: https://github.com/Hjdskes/sage
