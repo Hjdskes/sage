@@ -4,21 +4,32 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        devShells.default = with pkgs;
+
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        devShells.default =
+          with pkgs;
           mkShellNoCC {
             packages = [
-              clojure
+              (clojure.override { jdk = jdk25_headless; })
               clojure-lsp
               cljfmt
               clj-kondo
               graphviz
-              jdk25_headless
               mosquitto
+              nixfmt
             ];
           };
-      });
+      }
+    );
 }
