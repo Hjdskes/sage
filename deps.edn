@@ -33,5 +33,9 @@
                     :ns-default cljfmt.tool}
 
            ;; clj -M:dev:cloverage
-           :cloverage {:extra-deps {cloverage/cloverage {:mvn/version "1.2.4"}}
-                       :main-opts ["-m" "cloverage.coverage" "--src-ns-path" "src" "--test-ns-path" "test"]}}}
+           :cloverage {:extra-deps {cloverage/cloverage {:mvn/version "1.2.4"}
+                                    org.clojars.tooooolong/clojure-cobertura-coverage {:mvn/version "0.1.3"}}
+                       :main-opts ["-m" "cloverage.coverage"
+                                   "--custom-report" "cloverage.coverage.cobertura/report"
+                                   "--src-ns-path" "src"
+                                   "--test-ns-path" "test"]}}}

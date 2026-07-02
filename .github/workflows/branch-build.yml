@@ -29,21 +29,16 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: read
+      code-quality: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - name: Produce coverage report with Cloverage
-        run: nix develop --command clj -Mdev:cloverage --text
-      - name: Comment coverage summary on PR
-        uses: marocchino/sticky-pull-request-comment@v3
+        run: nix develop --command clj -M:dev:cloverage --no-html
+      - uses: actions/upload-code-coverage@v1
         with:
-          hide_and_recreate: true
-          hide_classify: "OUTDATED"
-          path: target/coverage/coverage.txt
-          message: |
-            ## Test Coverage
-            ```
-            {{{content}}}
-            ```
+          file: target/coverage/cobertura.xml
+          language: Clojure
+          label: code-coverage
