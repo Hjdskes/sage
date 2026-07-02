@@ -30,7 +30,7 @@
               clojure-lsp
               cljfmt
               clj-kondo
-              mosquitto
+              (mosquitto.override { withSystemd = false; })
               nixfmt
               treefmt.config.build.wrapper
             ];
