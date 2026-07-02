@@ -1,0 +1,39 @@
+name: Branch build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+      - name: Cache the Nix store
+        uses: DeterminateSystems/magic-nix-cache-action@v14
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Cache Clojure dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            .cpcache
+          key: ${{ runner.os }}-clj-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clj-
+      - name: Lint with clj-kondo
+        run: nix develop --command clj -M:clj-kondo --lint src test
+      - name: Format with cljfmt
+        run: nix develop --command clj -T:cljfmt check
+      - name: Run tests
+        run: nix develop --command clj -X:dev:test
