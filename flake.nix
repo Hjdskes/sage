@@ -25,7 +25,6 @@
               clojure-lsp
               cljfmt
               clj-kondo
-              graphviz
               mosquitto
               nixfmt
             ];
