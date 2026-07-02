@@ -1,5 +1,7 @@
 # Sage
 
+[![Branch build](https://github.com/Hjdskes/sage/actions/workflows/branch-build.yml/badge.svg)](https://github.com/Hjdskes/sage/actions/workflows/branch-build.yml)
+
 My home automation system
 
 ## Bugs
