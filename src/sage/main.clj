@@ -31,7 +31,7 @@
   [profile]
   (t/log! {:data {:config/profile profile}} "Starting Sage")
   (config/init! profile)
-  (mqtt/start-system! odoyle.session/mqtt-handler))
+  (mqtt/start-system! (odoyle.session/->mqtt-handler)))
 
 (defn -main
   "Main entrypoint into Sage."
@@ -50,7 +50,7 @@
 
   (defn stop
     []
-    (when (bound? #'sage) (.close ^java.lang.AutoCloseable sage)))
+    (when (bound? #'sage) (try (.close ^java.lang.AutoCloseable sage) (catch Exception _e nil))))
 
   (defn start
     []
