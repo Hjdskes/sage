@@ -19,6 +19,8 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Cache the Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v14
+        with:
+          use-flakehub: false
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Cache Clojure dependencies
