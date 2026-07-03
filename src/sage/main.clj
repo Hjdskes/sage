@@ -39,7 +39,7 @@
   (set-uncaught-exception-handler!)
   (let [latch (java.util.concurrent.CountDownLatch. 1)
         sage (start! :default)]
-    (.addShutdownHook (Runtime/getRuntime)
+    (.addShutdownHook ^Runtime (Runtime/getRuntime)
                       (Thread. ^Runnable (fn []
                                            (shutdown! sage)
                                            (.countDown latch))))

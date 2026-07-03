@@ -6,7 +6,9 @@
     [sage.config :as config]
     [sage.mqtt.client :as mqtt.client]
     [sage.util.closeable :refer [closeable]]
-    [taoensso.telemere :as t]))
+    [taoensso.telemere :as t])
+  (:import
+    [org.eclipse.paho.client.mqttv3 IMqttToken]))
 
 (set! *warn-on-reflection* true)
 
@@ -68,7 +70,7 @@
       ;; or messages that aren't meant for us, such as /set or /get.
       ;; TODO: subscribing to # means any retained messages on the broker are delivered immediately at
       ;; startup.
-      (mqtt.client/subscribe! conn "#" :at-most-once (message-handler (partial handler-fn conn)))
+      ^IMqttToken (mqtt.client/subscribe! conn "#" :at-most-once (message-handler (partial handler-fn conn)))
       5000)
     (closeable conn (fn [conn]
                       (t/log! {:data {:mqtt/broker uri}} "Disconnecting from MQTT")
