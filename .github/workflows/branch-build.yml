@@ -35,16 +35,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - name: Produce coverage report with Cloverage
-        run: nix develop --command clj -M:dev:cloverage --no-html
-      - name: Process coverage report
-        uses: clearlyip/code-coverage-report-action@v7
+      - uses: ./.github/actions/coverage
         id: coverage
         with:
-          filename: target/coverage/cobertura.xml
-          artifact_download_workflow_names: 'Branch build,Coverage refresh'
-          only_list_changed_files: true
           fail_on_negative_difference: true
+          only_list_changed_files: true
       - name: Comment coverage summary on PR
         uses: marocchino/sticky-pull-request-comment@v3
         if: steps.coverage.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
