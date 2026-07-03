@@ -30,27 +30,35 @@
   "Starts Sage, returning a closeable that closes all connections and frees all resources."
   [profile]
   (t/log! {:data {:config/profile profile}} "Starting Sage")
-  (config/init! profile)
-  (mqtt/start-system! odoyle.session/mqtt-handler))
+  (try
+    (config/init! profile)
+    (mqtt/start-system! odoyle.session/mqtt-handler)
+    (catch Exception e
+      (t/log! {:level :error :data (Throwable->map e)} "Exception during startup")
+      nil)))
 
 (defn -main
   "Main entrypoint into Sage."
   [& _args]
   (set-uncaught-exception-handler!)
-  (let [latch (java.util.concurrent.CountDownLatch. 1)
-        sage (start! :default)]
-    (.addShutdownHook ^Runtime (Runtime/getRuntime)
-                      (Thread. ^Runnable (fn []
-                                           (shutdown! sage)
-                                           (.countDown latch))))
-    (.await latch)))
+  (let [latch (java.util.concurrent.CountDownLatch. 1)]
+    (if-let [sage (start! :default)]
+      (do
+        (.addShutdownHook ^Runtime (Runtime/getRuntime)
+                          (Thread. ^Runnable (fn []
+                                               (shutdown! sage)
+                                               (.countDown latch))))
+        (.await latch)
+        (System/exit 0))
+      (System/exit 1))))
 
 (comment
   (declare sage)
 
   (defn stop
     []
-    (when (bound? #'sage) (.close ^java.lang.AutoCloseable sage)))
+    (when (and (bound? #'sage) (some? #'sage))
+      (.close ^java.lang.AutoCloseable sage)))
 
   (defn start
     []
