@@ -38,7 +38,7 @@
                                                                  :mqtt/payload payload})}
                                      "Failed to parse MQTT message as JSON")
                              nil))]
-      (t/trace! {:id :mqtt/handler :data {:mqtt/topic topic :mqtt/metadata metadata :mqtt/payload payload}}
+      (t/trace! {:id :mqtt/handler :data {:mqtt/topic topic :mqtt/metadata metadata :mqtt/payload parsed}}
                 (try
                   (handler-fn topic parsed)
                   (catch Exception ex
