@@ -1,0 +1,25 @@
+name: Generate and process code coverage report
+inputs:
+  fail_on_negative_difference:
+    default: 'false'
+  only_list_changed_files:
+    default: 'false'
+outputs:
+  file:
+    description: Path to the generated coverage report markdown
+    value: ${{ steps.coverage.outputs.file }}
+runs:
+  using: composite
+  steps:
+    - name: Produce coverage report with Cloverage
+      shell: bash
+      run: nix develop --command clj -M:dev:cloverage --no-html
+    - name: Process coverage report
+      id: coverage
+      uses: clearlyip/code-coverage-report-action@v7
+      with:
+        filename: target/coverage/cobertura.xml
+        artifact_download_workflow_names: 'Branch build,Coverage refresh'
+        only_list_changed_files: ${{ inputs.only_list_changed_files }}
+        fail_on_negative_difference: ${{ inputs.fail_on_negative_difference }}
+        negative_difference_by: overall
