@@ -22,7 +22,7 @@ POM_XML="$SCRIPT_DIR/pom.xml"
 
 update() {
   pushd "$GIT_TOPLEVEL" &> /dev/null
-  clj -X:deps mvn-pom
+  clojure -X:deps mvn-pom
   mv pom.xml "$POM_XML"
   popd &> /dev/null
 }

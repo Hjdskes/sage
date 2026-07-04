@@ -13,7 +13,7 @@ runs:
   steps:
     - name: Produce coverage report with Cloverage
       shell: bash
-      run: nix develop --command clj -M:dev:cloverage --no-html
+      run: nix develop --command clojure -M:dev:cloverage --no-html
     - name: Process coverage report
       id: coverage
       uses: clearlyip/code-coverage-report-action@v7
