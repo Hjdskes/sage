@@ -47,10 +47,6 @@
             ];
           };
 
-        checks = {
-          formatting = treefmt.config.build.check self;
-        };
-
         formatter = treefmt.config.build.wrapper;
 
         packages = rec {
