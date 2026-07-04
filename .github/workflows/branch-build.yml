@@ -21,9 +21,9 @@ jobs:
       - name: Format the entire source tree
         run: nix fmt
       - name: Lint with clj-kondo
-        run: nix develop --command clj -M:clj-kondo --lint src test
+        run: nix develop --command clojure -M:clj-kondo --lint src test
       - name: Run tests
-        run: nix develop --command clj -X:dev:test
+        run: nix develop --command clojure -X:dev:test
   coverage:
     runs-on: ubuntu-latest
     timeout-minutes: 10
