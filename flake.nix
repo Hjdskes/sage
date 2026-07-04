@@ -36,6 +36,7 @@
           mkShellNoCC {
             packages = [
               (clojure.override { inherit jdk; })
+              jdk
               clojure-lsp
               cljfmt
               clj-kondo
