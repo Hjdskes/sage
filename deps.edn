@@ -38,4 +38,9 @@
                        :main-opts ["-m" "cloverage.coverage"
                                    "--custom-report" "cloverage.coverage.cobertura/report"
                                    "--src-ns-path" "src"
-                                   "--test-ns-path" "test"]}}}
+                                   "--test-ns-path" "test"]}
+
+           ;; clj -T:build uber, or
+           ;; clj -T:build clean
+           :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.14"}}
+                   :ns-default build}}}

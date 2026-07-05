@@ -24,6 +24,8 @@ jobs:
         run: nix develop --command clojure -M:clj-kondo --lint src test
       - name: Run tests
         run: nix develop --command clojure -X:dev:test
+      - name: Build uberjar
+        run: nix develop --command clojure -T:build uber
   coverage:
     runs-on: ubuntu-latest
     timeout-minutes: 10
