@@ -1,0 +1,5 @@
+{
+  "name": "nl.hjdskes/sage",
+  "version": "0.0.1",
+  "main-ns": "sage.main"
+}

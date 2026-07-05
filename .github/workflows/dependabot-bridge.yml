@@ -26,4 +26,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Check that Dependabot is in sync with deps.edn
-        run: nix develop --command  .github/dependabot/clojure2dependabot.sh update+check
+        run: nix develop --command .github/dependabot/clojure2dependabot.sh update+check
+      - name: Check that clj-nix's deps-lock.json is in sync with deps.edn.
+        run: |
+          nix develop --command deps-lock --alias-include build dev test
+          git diff --exit-code deps-lock.json

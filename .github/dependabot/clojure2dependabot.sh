@@ -28,7 +28,7 @@ update() {
 }
 
 check() {
-  if git diff --ignore-all-space --exit-code "$POM_XML"; then
+  if git diff --exit-code "$POM_XML"; then
     echo "$DEPS_EDN and $POM_XML are in sync."
     exit 0
   else
