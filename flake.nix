@@ -76,9 +76,12 @@
                     ./flake.nix
                     ./resources
                     (fs.fileFilter (file: file.hasExt "clj" || file.hasExt "cljc") ./src)
+                    (fs.fileFilter (file: file.hasExt "clj" || file.hasExt "cljc") ./test)
                   ];
                 };
               buildCommand = "clojure -T:build uber";
+              doCheck = true;
+              checkPhase = "clojure -X:dev:test :excludes '[:integration]'";
             };
         };
       }
