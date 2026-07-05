@@ -27,13 +27,13 @@
   [conn topics-and-qos f]
   (.waitForCompletion (mqtt/subscribe! conn topics-and-qos f) 1000))
 
-(deftest connection
+(deftest ^:integration connection
   (let [conn (connect)]
     (is (.isConnected conn))
     (mqtt/disconnect-and-close! conn wait-timeout-ms)
     (is (not (.isConnected conn)))))
 
-(deftest connection-with-handlers
+(deftest ^:integration connection-with-handlers
   (let [done (CountDownLatch. 3)
         calls-log (atom {})
         log-call (fn [k]
@@ -55,7 +55,7 @@
            @calls-log))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest publish-empty-messages
+(deftest ^:integration publish-empty-messages
   (let [conn (connect)]
     (dotimes [_ 50]
       (let [delivery-token (mqtt/publish! conn "sage/test" nil)]
@@ -63,7 +63,7 @@
         (is (.isComplete delivery-token))))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest publish-messages
+(deftest ^:integration publish-messages
   (let [conn (connect)]
     (dotimes [n 50]
       (let [delivery-token (mqtt/publish! conn "sage/test" (str "hello " n))]
@@ -71,7 +71,7 @@
         (is (.isComplete delivery-token))))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest basic-subscription
+(deftest ^:integration basic-subscription
   (let [n 100
         conn (connect)
         latch (CountDownLatch. n)]
@@ -82,7 +82,7 @@
     (is (= 0 (.getCount latch)))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest subscription-with-multiple-consumers
+(deftest ^:integration subscription-with-multiple-consumers
   (let [n 100
         conn1 (connect)
         conn2 (connect)
@@ -98,7 +98,7 @@
     (mqtt/disconnect-and-close! conn1)
     (mqtt/disconnect-and-close! conn2)))
 
-(deftest multi-topic-subscription
+(deftest ^:integration multi-topic-subscription
   (let [n 50
         m 60
         conn (connect)
@@ -114,7 +114,7 @@
     (is (= 0 (.getCount latch)))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest different-subscriptions-with-different-handlers
+(deftest ^:integration different-subscriptions-with-different-handlers
   (let [n 50
         m 60
         conn (connect)
@@ -131,7 +131,7 @@
     (is (= [0 0] [(.getCount latch1) (.getCount latch2)]))
     (mqtt/disconnect-and-close! conn)))
 
-(deftest publish-from-consumer
+(deftest ^:integration publish-from-consumer
   (let [n 100
         conn (connect)
         latch (CountDownLatch. n)]
