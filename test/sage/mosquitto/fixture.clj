@@ -22,9 +22,10 @@
   (swap! *running?
          (fn [running?]
            (or running?
-               (-> (sh/sh "mosquitto_pub" "-t" "test" "-n" "--quiet")
-                   :exit
-                   zero?)))))
+               (try
+                 (zero? (:exit (sh/sh "mosquitto_pub" "-t" "test" "-n" "--quiet")))
+                 (catch java.io.IOException _
+                   false))))))
 
 (defn start-mosquitto
   "Starts Mosquitto in daemon mode. Prints stderr on failure."
