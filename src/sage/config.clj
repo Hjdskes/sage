@@ -20,7 +20,8 @@
    Must be called once at startup before calling any other function that works
    on the config, such as `get` below.
 
-   Calling this function again replaces the config (useful in tests to switch profiles).
+   Calling this function again replaces the config. This is useful in the REPL to
+   reload a changed config file, or in tests to switch profiles.
 
    Throws if the file `config.edn` is not on the class path."
   [profile]
