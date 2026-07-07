@@ -21,7 +21,7 @@ jobs:
       - name: Format the entire source tree
         run: nix fmt
       - name: Lint with clj-kondo
-        run: nix develop --command clojure -M:clj-kondo --lint src test
+        run: git diff --name-only --diff-filter=ACM main...HEAD -- '*.clj*' '*.edn' | xargs -r nix develop --command clojure -M:clj-kondo --parallel --lint
       - name: Run tests
         run: nix develop --command clojure -X:dev:test
       - name: Build uberjar
