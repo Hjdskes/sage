@@ -6,6 +6,10 @@
  :linters {:aliased-namespace-symbol {:level :warning}
            :alias-same-as-ns {:level :warning}
            :case-symbol-test {:level :warning}
+           :clojure-lsp/unused-public-var {:exclude
+                                           [build/clean
+                                            build/main-ns
+                                            build/uber]}
            :condition-always-true {:level :warning}
            :conditional-build-up {:level :warning}
            :consistent-alias {:aliases {}}
