@@ -15,10 +15,9 @@
    in the with-open binding.
 
    Note that this function does not protect against exceptions thrown during close-fn."
-  ^AutoCloseable
-  ([value]
+  (^AutoCloseable [value]
    (closeable value identity))
-  ([value close-fn]
+  (^AutoCloseable [value close-fn]
    (reify
      IDeref
      (deref [_] value)

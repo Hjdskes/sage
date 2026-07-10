@@ -4,6 +4,8 @@
     [sage.mqtt :as mqtt]
     [sage.odoyle.session :as odoyle.session]
     [taoensso.telemere :as t])
+  (:import
+    [java.lang AutoCloseable])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -19,7 +21,7 @@
 
 (defn shutdown!
   "Shuts down Sage, expects the closeable from start!."
-  [^java.lang.AutoCloseable closeable]
+  [^AutoCloseable closeable]
   (t/log! "Shutting down Sage")
   (try
     (.close closeable)
@@ -58,7 +60,7 @@
   (defn stop
     []
     (when (and (bound? #'sage) (some? #'sage))
-      (try (.close ^java.lang.AutoCloseable sage) (catch Exception _e nil))))
+      (try (.close ^AutoCloseable sage) (catch Exception _e nil))))
 
   (defn start
     []
