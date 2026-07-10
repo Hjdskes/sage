@@ -1,9 +1,7 @@
 (ns sage.odoyle.session
   (:require
-    [clojure.data.json :as json]
     [clojure.set :as set]
     [odoyle.rules :as o]
-    [sage.mqtt.client :as mqtt.client]
     [sage.odoyle.facts :as facts]
     [sage.odoyle.rules :as rules]
     [taoensso.telemere :as t]))
@@ -23,7 +21,6 @@
     facts))
 
 (defn- retract-commands
-  "Retracts all the given command facts from the given session."
   [session command-facts]
   (reduce
     (fn [session {:keys [device-id]}]
@@ -31,41 +28,40 @@
     session
     command-facts))
 
-(def ^:private *session
-  "The global O'Doyle session atom."
-  (atom (reduce o/add-rule (o/->session) rules/all-rules)))
+(defn- process-facts
+  "Inserts all facts into the given session and fires rules once.
 
-(defn process-facts!
-  "Insert all facts into the rules session and fire rules once.
+   Returns the new session and any commands produced as a result, after retracting them from the new session.
 
-   Returns any commands produced as a result, after retracting them from the session atomically.
    O'Doyle retracts old values overwritten by new facts automatically."
-  [facts]
-  (let [*command-facts (atom nil)]
-    (swap! *session (fn [session]
-                      (let [session (o/fire-rules (insert-facts session facts))
-                            command-facts (o/query-all session ::rules/get-commands)]
-                        (reset! *command-facts command-facts)
-                        (retract-commands session command-facts))))
-    (map #(set/rename-keys % {:device-id ::facts/device-id :command ::facts/command}) @*command-facts)))
+  [session facts]
+  (let [session' (o/fire-rules (insert-facts session facts))
+        command-facts (o/query-all session' ::rules/get-commands)
+        session'' (retract-commands session' command-facts)
+        commands (map #(set/rename-keys % {:device-id ::facts/device-id
+                                           :command ::facts/command})
+                      command-facts)]
+    [session'' commands]))
 
-;; TODO: should publishing happen here, or inside start-system!?
-;; TODO: when publishing, should we block or just scream into the void?
-;;       can we register a callback and alert on an error?
-(defn mqtt-handler
-  "Bridges MQTT and O'Doyle.
+(defn ->mqtt-handler
+  "Returns a stateful MQTT handler function that owns an O'Doyle session internally.
 
-   For each MQTT message, derive a sequence of facts, insert those into the O'Doyle session, fire
-   the rules, extract and retract the commands that are output by the rules, and emit those commands over
-   MQTT."
-  [conn topic data]
-  (let [facts (facts/->facts topic data)]
-    (if (seq facts)
-      (do
-        (t/log! {:data {:facts facts}} "Received new facts over MQTT")
-        (let [command-facts (process-facts! facts)]
-          (doseq [fact command-facts
-                  :let [[topic mqtt-message] (facts/<-fact fact)]]
-            (t/trace! {:id :mqtt/publish :data {:mqtt/topic topic :mqtt/message mqtt-message}})
-            (mqtt.client/publish! conn topic (json/write-str mqtt-message)))))
-      (t/log! {:data {:mqtt/message data}} "Received no new facts over MQTT"))))
+   The returned function accepts `[topic data]` and returns a (possibly empty) sequence of `[topic message]`
+   command tuples. For each MQTT message, it derives a sequence of facts, inserts those into the O'Doyle
+   session, fires the rules, extracts and retracts the commands that are output by the rules, and returns
+   those commands in a sequence of zero or more `[topic message]` command tuples.
+
+   The returned function is safe to call from a single thread, which is fine for now because Paho serialises
+   its callbacks (see notes in sage.mqtt.client)."
+  []
+  (let [*session (atom (reduce o/add-rule (o/->session) rules/all-rules))]
+    (fn [topic data]
+      (if-let [facts (seq (facts/->facts topic data))]
+        (do
+          (t/log! {:data {:facts facts}} "Received new facts over MQTT")
+          (let [[new-session command-facts] (process-facts @*session facts)]
+            (reset! *session new-session)
+            (map facts/<-fact command-facts)))
+        (do
+          (t/log! "Received no new facts over MQTT")
+          [])))))
