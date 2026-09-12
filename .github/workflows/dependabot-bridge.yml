@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v22
+        uses: DeterminateSystems/nix-installer-action@v23
       - name: Cache the Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v14
         with:
